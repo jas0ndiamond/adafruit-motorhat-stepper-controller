@@ -7,6 +7,6 @@ You will need to use an embedded JDK like the EJDK (https://blogs.oracle.com/jtc
 
 Using the regular ol' JVM to drive stepper motors will run, however a non-embedded JVM will have optimizations and scheduling that act as randomizers for signal timings. Your motors will probably spin, but the step transitions will not be smooth, the motors will heat up unduly, and damage to the hat/motors/pi becomes a possiblity.
 
-# Differences from the Adafruit Python Library
+## Differences from the Adafruit Python Library
 1. Hat shutdown or reset must be manually invoked via AdafruitMotorHat.shutdown()
 2. More debug output
