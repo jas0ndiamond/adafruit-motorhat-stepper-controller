@@ -1,7 +1,7 @@
 # adafruit-motorhat-stepper-controller
 Control stepper motors connected to an Adafruit MotorHat
 
-A sort-of-port-of the Adafruit Motor Hat Python library (https://github.com/adafruit/Adafruit-Motor-HAT-Python-Library) with some differences- see below. Drive connected stepper motors in Java. There are other Java ports of this library floating , and plenty of stuff here is borrowed from those.
+A sort-of-port-of the Adafruit Motor Hat Python library (https://github.com/adafruit/Adafruit-Motor-HAT-Python-Library) with some differences- see below. Drive connected stepper motors in Java. There are other Java ports of this library floating around, and plenty of stuff here is borrowed from those.
 
 You will need to use an embedded JDK like the EJDK (https://blogs.oracle.com/jtc/introducing-the-ejdk). Driving stepper motors requires realtime control, which is not guaranteed by JVMs based on Java SE.
 
