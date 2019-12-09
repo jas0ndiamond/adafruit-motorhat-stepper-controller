@@ -19,7 +19,6 @@ dependencies {
 
 task fatJar(type: Jar) {
 	//fatjar + client programs
-	//TODO: client jar created by client jar task
 
 	from(sourceSets.main.output)
 	manifest {

@@ -1,94 +1,84 @@
 package org.jason.steppercontroller.client;
 
-import java.util.HashMap;
-
-import org.jason.steppercontroller.AdafruitMotorHat;
-import org.jason.steppercontroller.AdafruitMotorHat.AdafruitStepperMotor;
-import org.jason.steppercontroller.AdafruitMotorHat.ServoCommand;
-import org.jason.steppercontroller.AdafruitMotorHat.Style;
+import org.jason.steppercontroller.MotorControl;
 
 public class MotorCommand {
 
-	public static void main(String[] args) throws Exception
-	{
-		HashMap<Integer, Style> stepStyles = new HashMap<>();
-		stepStyles.put(1, AdafruitMotorHat.Style.SINGLE);
-		stepStyles.put(2, AdafruitMotorHat.Style.DOUBLE);
-		stepStyles.put(3, AdafruitMotorHat.Style.INTERLEAVE);
-		stepStyles.put(4, AdafruitMotorHat.Style.MICROSTEP);
-		
-		HashMap<Integer, Integer> motors = new HashMap<>();
-		motors.put(1, AdafruitMotorHat.AdafruitStepperMotor.PORT_M1_M2);		
-		motors.put(2, AdafruitMotorHat.AdafruitStepperMotor.PORT_M3_M4);
-		
-		HashMap<String, ServoCommand> directions = new HashMap<>();
-		directions.put("f", ServoCommand.FORWARD);
-		directions.put("b", ServoCommand.BACKWARD);
+	private final static int HAT_ADDR = 0x60;
+	private final static int HAT_FREQ = 1600;
+	private final static String MOTOR_X_NAME = "motorX";
+	private final static String MOTOR_Y_NAME = "motorY";
 
-		//StepperCommand s 1 200 f 30 3 3
-		//[motor steps-per-rev direction steps style speed]
-		
+	public static void main(String[] args) throws Exception {
+		// StepperCommand s 1 200 f 30 3 3
+		// [motor steps-per-rev direction steps style speed]
+
 		int motor;
-		AdafruitMotorHat mh;
-		if(args.length == 7 && args[0].equals("s"))
-		{
+		if (args.length == 7 && args[0].equalsIgnoreCase("s")) {
+
+			MotorControl mc = new MotorControl(HAT_ADDR, HAT_FREQ, false);
+
 			motor = Integer.parseInt(args[1]);
-			mh = new AdafruitMotorHat(0x60, 1600); // Default addr 0x60
+
+			int stepsPerRev = Integer.parseInt(args[2]);
+			int stepCount = Integer.parseInt(args[4]);
+			int stepStyle = Integer.parseInt(args[5]);
+			int speed = Integer.parseInt(args[6]);
+
+			if (speed <= 0) {
+				speed = 1;
+			}
+
+			int direction = -99;
+			if (args[3].equalsIgnoreCase("f")) {
+				direction = MotorControl.DIRECTION_FORWARD;
+			} else if (args[3].equalsIgnoreCase("b")) {
+				direction = MotorControl.DIRECTION_BACKWARD;
+			} else {
+				System.out.println("Invalid direction");
+				System.exit(-1);
+			}
 			
-			if(motors.containsKey(motor))
-			{
-				int stepsPerRev = Integer.parseInt(args[2]);
-				String direction = args[3];
-				int stepCount = Integer.parseInt(args[4]);
-				int stepStyle = Integer.parseInt(args[5]);
-				int speed = Integer.parseInt(args[6]);
-				
+			// add our 2 motors
+			mc.addMotor(MOTOR_X_NAME, MotorControl.MOTOR_M1_M2, speed);
+			mc.addMotor(MOTOR_Y_NAME, MotorControl.MOTOR_M3_M4, speed);
 
-				if(directions.containsKey(direction))
-				{
-					if(stepStyles.containsKey(stepStyle))
-					{
-						AdafruitStepperMotor stepperMotor = mh.getStepper(motors.get(motor));
-						stepperMotor.setSpeed(speed);
-						stepperMotor.step
-						(
-								stepCount, 
-								directions.get(direction), 
-								stepStyles.get(stepStyle)
-						);
-					}
-					else
-					{
-						System.out.println("Could not move motor unknown step style");
-					}
-				}
-				else
-				{
-					System.out.println("Could not move motor unknown direction");
-				}
+			if(motor == MotorControl.MOTOR_M1_M2) {
+				mc.stepMotor(MOTOR_X_NAME, stepCount, direction, stepStyle);
+			}
+			else if (motor == MotorControl.MOTOR_M3_M4)
+			{
+				mc.stepMotor(MOTOR_Y_NAME, stepCount, direction, stepStyle);
 			}
 			else
 			{
-				System.out.println("Could not move unknown motor");
+				System.out.println("Invalid motor");
 			}
+			
+			mc.shutdown();
+			
+			
+		} else if (args.length == 2 && args[0].equalsIgnoreCase("k")) {
 
-		}
-		else if(args.length == 2 && args[0].equals("k"))
-		{
 			motor = Integer.parseInt(args[1]);
-			mh = new AdafruitMotorHat(0x60, 1600); // Default addr 0x60
 
-			if(motor == 1 || motor == 2)
-			{
-				mh.getStepper(motor).shutdown();
+			MotorControl mc = null;
+			if (motor == MotorControl.MOTOR_M1_M2) {
+				mc = new MotorControl(HAT_ADDR, HAT_FREQ);
+
+				mc.releaseMotor(MOTOR_X_NAME);
+
+			} else if (motor == MotorControl.MOTOR_M3_M4) {
+				mc = new MotorControl(HAT_ADDR, HAT_FREQ);
+
+				mc.releaseMotor(MOTOR_Y_NAME);
 			}
 			else
 			{
-				System.out.println("Could not shutdown unknown motor");
+				System.out.println("Invalid motor");
 			}
-		}
-		else
-		{
+
+		} else {
 			System.out.println("Unknown command");
 		}
 	}
