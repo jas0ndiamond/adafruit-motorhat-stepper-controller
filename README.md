@@ -9,7 +9,7 @@ https://www.azul.com/downloads/zulu-community/
 
 Driving stepper motors requires realtime control, which is not guaranteed by JVMs based on Java SE.
 
-Using the regular ol' JVM to drive stepper motors will run, however a non-embedded JVM will have optimizations and scheduling that act as randomizers for signal timings. Your motors will probably spin, but the step transitions will not be smooth, the motors will heat up unduly, and damage to the hat/motors/pi becomes a possiblity.
+Using the regular ol' JVM to drive stepper motors will run, however a non-embedded JVM will have garbage collection, optimizations, and scheduling that act as randomizers for signal timings. Your motors will probably spin, but the step transitions will not be smooth, the motors will heat up unduly, and damage to the hat/motors/pi becomes a possiblity.
 
 ## Differences from the Adafruit Python Library (and some of the reference implementations)
 1. Hat shutdown or reset must be manually invoked via AdafruitMotorHat.shutdown().
@@ -18,8 +18,9 @@ Using the regular ol' JVM to drive stepper motors will run, however a non-embedd
 4. Motors are referenced by a user-designated name rather than directly by the motor number or port.
 5. Dead code removed.
 6. Fixed bugs and inconsistencies managing speed and steps per revolution.
-7. More debug output.
-8. DC Motors not supported for now.
+7. Some math is done on class instance instantiation rather than over and over again in commonly-used functions.
+8. More debug output.
+9. DC Motors not supported for now.
 
 ## Dependencies
 1. Pi4J for I2C communication and PWM management.
