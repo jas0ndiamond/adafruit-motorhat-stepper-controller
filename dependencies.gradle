@@ -1,12 +1,17 @@
 ext {
-	libs = [
-		pi4j: [
-			'com.pi4j:pi4j-parent:1.2',
-			'com.pi4j:pi4j-core:1.2',
-			'com.pi4j:pi4j-native:1.2'
-		],
-		test: [
-			'org.testng:testng:6.9.4'
-		]
-	]
+    libs = [
+        pi4j: [
+            'com.pi4j:pi4j-parent:1.4',
+            'com.pi4j:pi4j-core:1.4',
+            'com.pi4j:pi4j-native:1.4'
+        ],
+        logging: [
+            'org.slf4j:slf4j-api:1.7.25',
+            'ch.qos.logback:logback-core:1.2.3',
+            'ch.qos.logback:logback-classic:1.2.3'
+        ],
+        test: [
+            'org.testng:testng:6.9.4'
+        ]
+    ]
 }

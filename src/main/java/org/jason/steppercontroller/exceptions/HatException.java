@@ -12,6 +12,11 @@ public class HatException extends Exception {
 	/**
 	 * 
 	 */
+	private static final long serialVersionUID = 8398923463841508331L;
+
+	/**
+	 * 
+	 */
 	public HatException() {
 		// TODO Auto-generated constructor stub
 	}

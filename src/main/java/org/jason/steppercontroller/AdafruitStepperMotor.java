@@ -1,14 +1,19 @@
 package org.jason.steppercontroller;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.jason.steppercontroller.MotorControl.ServoCommand;
 import org.jason.steppercontroller.MotorControl.Style;
 import org.jason.steppercontroller.exceptions.MotorException;
 import org.jason.steppercontroller.exceptions.StepException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AdafruitStepperMotor
 {
+	private final static Logger LOGGER = LoggerFactory.getLogger(AdafruitStepperMotor.class);
+
 	public final static int PORT_M1_M2 = 1; // Port #1
 	public final static int PORT_M3_M4 = 2; // Port #2
 
@@ -98,10 +103,8 @@ public class AdafruitStepperMotor
 	{
 		int pwmA = 255, pwmB = 255;
 
-		//System.out.println("Initial Current Step: " + this.currentStep);
+		LOGGER.trace("Initial Current Step: " + this.currentStep);
 
-
-		
 		// first determine what sort of stepping procedure we're up to
 		if (style == Style.SINGLE)
 		{
@@ -125,7 +128,7 @@ public class AdafruitStepperMotor
 				}
 			}
 			
-			//System.out.println("Current Step: " + this.currentStep);
+			LOGGER.trace("Current Step: " + this.currentStep);
 		}
 		else if (style == Style.DOUBLE)
 		{
@@ -215,6 +218,7 @@ public class AdafruitStepperMotor
 		}
 		else
 		{
+			
 			int[][] step2coils = new int[][] { {1, 0, 0, 0},
 					{1, 1, 0, 0},
 					{0, 1, 0, 0},
@@ -224,13 +228,10 @@ public class AdafruitStepperMotor
 					{0, 0, 0, 1},
 					{1, 0, 0, 1} };
 
-
 			coils = step2coils[this.currentStep / (this.MICROSTEPS / 2)];
-
-
 		} 
-		//System.out.println("Final Current Step: " + currentStep);
-		//System.out.println( "coils state = " + Arrays.toString(coils)  );
+		
+		LOGGER.trace("Final Current Step: " + currentStep + "\n\tcoils state = " + Arrays.toString(coils)  );
 
 		writeToCoils(coils);
 
@@ -242,31 +243,32 @@ public class AdafruitStepperMotor
 		//validation done by MotorControl.stepMotor
 		
 		//local to the step command. based on the speed set by the motor.
+		//TODO: calculate when speed is set, rather than on every call to this function
 		double mySecondsPerStep = this.secondsPerStep;
 		long myStepDelay = (long) (mySecondsPerStep * 1000L);
 		
 		int latestStep = 0;
 
+		LOGGER.debug("Stepping with style: {}" + stepStyle);
+		
 		if (stepStyle == Style.INTERLEAVE) {
-			System.out.println("Interleave stepping");
 			
 			mySecondsPerStep = mySecondsPerStep / 2.0;
 			myStepDelay = (long) (mySecondsPerStep * 1000L);
 		}
 		else if (stepStyle == Style.MICROSTEP)
 		{
-			System.out.println("Micro stepping");
 			mySecondsPerStep /= this.MICROSTEPS;
 			myStepDelay = (long) (mySecondsPerStep * 1000L);
 			
 			steps *= this.MICROSTEPS;
 		}
-		//System.out.println(sPerS + " sec per step");
+
+		LOGGER.trace(mySecondsPerStep + " sec per step");
 
 		//execute the steps
-		for (int s=0; s<steps; s++)
+		for (int s = 0; s < steps; s++)
 		{
-
 			latestStep = this.oneStep(direction, stepStyle);
 			Thread.sleep(myStepDelay);
 		}

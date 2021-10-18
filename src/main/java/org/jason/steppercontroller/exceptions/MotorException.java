@@ -12,6 +12,11 @@ public class MotorException extends Exception {
 	/**
 	 * 
 	 */
+	private static final long serialVersionUID = -2464149037356886826L;
+
+	/**
+	 * 
+	 */
 	public MotorException() {
 		// TODO Auto-generated constructor stub
 	}

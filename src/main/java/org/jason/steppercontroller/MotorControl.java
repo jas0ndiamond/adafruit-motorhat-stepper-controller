@@ -7,9 +7,13 @@ import java.util.Map.Entry;
 import org.jason.steppercontroller.exceptions.HatException;
 import org.jason.steppercontroller.exceptions.MotorException;
 import org.jason.steppercontroller.exceptions.StepException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MotorControl {
 
+	private final static Logger LOGGER = LoggerFactory.getLogger(MotorControl.class);
+	
 	public enum Style
 	{  
 		SINGLE, DOUBLE, INTERLEAVE, MICROSTEP
@@ -22,7 +26,8 @@ public class MotorControl {
 	
 	private final static int DEFAULT_HAT_ADDR = 0x60;
 	private final static int DEFAULT_FREQ = 1600;
-	private final static int DEFAULT_MOTOR_SPEED = 30;
+	
+	public  final static int DEFAULT_MOTOR_SPEED = 30;
 	
 	public final static int DIRECTION_FORWARD = 0;
 	public final static int DIRECTION_BACKWARD = 1;
@@ -38,7 +43,6 @@ public class MotorControl {
 	private final static HashMap<Integer, Integer> ports = new HashMap<Integer, Integer>() 
 	{
 		private static final long serialVersionUID = 4739823974683355020L;
-
 		{
 			put(MOTOR_M1_M2, AdafruitStepperMotor.PORT_M1_M2);
 			put(MOTOR_M3_M4, AdafruitStepperMotor.PORT_M3_M4);
@@ -95,7 +99,19 @@ public class MotorControl {
 		
 		motors.put(name, hat.getStepper( ports.get(port) ) );
 		
-		motors.get(name).setSpeed(speed);
+		setMotorSpeed(name, speed);
+	}
+	
+	public void setMotorSpeed(String name, int speed)
+	{
+		//speed in rpms
+		if(motors.containsKey(name)) {
+			motors.get(name).setSpeed(speed);
+		}
+		else
+		{
+			LOGGER.error("Could not set speed on unknown motor");
+		}
 	}
 	
 	public synchronized void stepMotor(String name, int steps, int direction, int stepStyle)
@@ -105,10 +121,10 @@ public class MotorControl {
 				
 				motors.get(name).step(steps, directions.get(direction), stepStyles.get(stepStyle));
 			} else {
-				System.out.println("Invalid step paramters.");
+				LOGGER.error("Invalid step parameters.");
 			}
 		} else {
-			System.out.println("Invalid motor.");
+			LOGGER.error("Invalid motor.");
 		}
 	}
 	
@@ -135,21 +151,22 @@ public class MotorControl {
 	public void releaseMotor(String motorName) throws IOException {
 		if(motors.containsKey(motorName) ) {
 			motors.get(motorName).shutdown();
+		} else {
+			LOGGER.warn("Motor {} not present for release", motorName);
 		}
 	}
 	
 	public void releaseMotors()
 	{
 		for( Entry<String, AdafruitStepperMotor> motor : motors.entrySet()) {
-			
 			try 
 			{
-				System.out.println("Shutting down motor: " + motor.getKey());
+				LOGGER.debug("Shutting down motor: {}", motor.getKey());
 				releaseMotor(motor.getKey());
 			} 
 			catch (IOException e) 
 			{
-				e.printStackTrace();
+				LOGGER.warn("Exception releasing motor", e);
 			}
 		}
 	}
@@ -159,6 +176,10 @@ public class MotorControl {
 		//do not release motors
 		
 		//shutdown the underlying hat
-		hat.shutdown();
+		if(hat != null) {
+			hat.shutdown();
+		} else {
+			LOGGER.warn("Skipping shutdown of null motor hat");
+		}
 	}
 }

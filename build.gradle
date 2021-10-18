@@ -2,61 +2,61 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply from: 'dependencies.gradle'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 version = '1.0'
-
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-	compile libs.pi4j    
-	testCompile libs.test
+    compile libs.pi4j
+    compile libs.logging     
+    testCompile libs.test
 }
 
 task fatJar(type: Jar) {
-	//fatjar + client programs
+    //fatjar + client programs
 
-	from(sourceSets.main.output)
-	manifest {
+    from(sourceSets.main.output)
+    manifest {
         attributes 'Implementation-Title': 'Stepper Motor Controller FatJar',
-        	'Implementation-Version': version,
-        	'Main-Class': 'org.jason.steppercontroller.client.MotorCommand'
+            'Implementation-Version': version,
+            'Main-Class': 'org.jason.steppercontroller.client.MotorCommand'
     }
     baseName = project.name + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
 jar {
-	from(sourceSets.main.output)
-	manifest {
+    from(sourceSets.main.output)
+    manifest {
         attributes 'Implementation-Title': 'Stepper Motor Controller',
-        	'Implementation-Version': version
+            'Implementation-Version': version
     }
     baseName = project.name
     //no client programs
-	exclude "org/jason/steppercontroller/client/**"
+    exclude "org/jason/steppercontroller/client/**"
 }
 
 sourceSets {
-	main {
-		java {
-			srcDir 'src/main/java'
-		}
-	}
-	test {
-		java {
-			srcDir 'src/test/java'
-		}
-	}
+    main {
+        java {
+            srcDir 'src/main/java'
+        }
+    }
+    test {
+        java {
+            srcDir 'src/test/java'
+        }
+    }
 }
 
 test {
-	useTestNG() {
-		useDefaultListeners = true
-		suites 'src/test/resources/testng.xml'
-	}
+    useTestNG() {
+        useDefaultListeners = true
+        suites 'src/test/resources/testng.xml'
+    }
 }
