@@ -1,0 +1,9 @@
+/bin/
+/build/
+/.gradle/
+/tmp/
+.classpath
+.project
+/.settings/
+todo.txt
+/scripts/

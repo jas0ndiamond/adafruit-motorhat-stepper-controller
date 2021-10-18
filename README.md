@@ -11,13 +11,25 @@ Driving stepper motors requires realtime control, which is not guaranteed by JVM
 
 Using the regular ol' JVM to drive stepper motors will run, however a non-embedded JVM will have optimizations and scheduling that act as randomizers for signal timings. Your motors will probably spin, but the step transitions will not be smooth, the motors will heat up unduly, and damage to the hat/motors/pi becomes a possiblity.
 
-## Differences from the Adafruit Python Library
-1. Hat shutdown or reset must be manually invoked via AdafruitMotorHat.shutdown()
-2. More debug output
-3. DC Motors not supported
+## Differences from the Adafruit Python Library (and some of the reference implementations)
+1. Hat shutdown or reset must be manually invoked via AdafruitMotorHat.shutdown().
+2. I2C bus close() function exposed and is invoked by MotorControl.shutdown().
+3. Stepper Motor objects not initialized upon Hat initialization. They are initialized by calls to MotorControl.addMotor().
+4. Motors are referenced by a user-designated name rather than directly by the motor number or port.
+5. Dead code removed.
+6. Fixed bugs and inconsistencies managing speed and steps per revolution.
+7. More debug output.
+8. DC Motors not supported for now.
 
 ## Dependencies
-1. Pi4J for I2C communication.
+1. Pi4J for I2C communication and PWM management.
 
 ## Usage
+The MotorControl class is the facade and provides the API for managing hats and moving motors.
+
 This is a motor controller library with a few client programs.
+
+## Acknowledgements and Reference Implementations
+* https://github.com/zugaldia/adafruit-motor-hat
+* https://github.com/fcazalet/adafruit-motor-hat
+* Others
